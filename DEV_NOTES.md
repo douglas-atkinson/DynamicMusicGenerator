@@ -39,6 +39,19 @@ Teaching Notes:
 
 ---
 
+### 2025-07-11
+
+- Coded `music_generator.py`
+  - Contains functions `generate_random_melody`, `generate_scale`
+  - Added dictionary for key scales
+- Coded `gui_app.py`
+  - Dropdown for Key
+  - Button to push to generate random melody
+  - Button to push to generate scale
+- Snapshot
+  - 02_01_music_generator.py
+  - 02_02_gui_app.py
+
 ## Next Planned Steps
 
 - Build minimal GUI with:
