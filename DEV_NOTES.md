@@ -44,13 +44,24 @@ Teaching Notes:
 - Coded `music_generator.py`
   - Contains functions `generate_random_melody`, `generate_scale`
   - Added dictionary for key scales
+  - Added dictionary for instruments
+  - Added dictionary for note lengths
 - Coded `gui_app.py`
   - Dropdown for Key
   - Button to push to generate random melody
   - Button to push to generate scale
+  - Added menu to load a midi file
+  - Added button to play midi file using subprocess
+  - Added controls for tempo, instrument selection, note length
+- Coded `slider_spinner.py`
+  - Combo control for a slider and spinner synced
 - Snapshot
   - 02_01_music_generator.py
   - 02_02_gui_app.py
+  - 03_01_gui_app.py
+  - 04_01_slider_spinner.py
+  - 04_02_music_generator.py
+  - 04_03_gui_app.py
 
 ## Next Planned Steps
 
