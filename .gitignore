@@ -14,5 +14,8 @@ __pycache__/
 env/
 venv/
 
+# MIDI Files
+*.mid
+
 # Data or logs (if any)
 *.log
