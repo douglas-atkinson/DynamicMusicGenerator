@@ -4,15 +4,8 @@
 import pretty_midi
 import random
 
-KEY_SCALES_MAJOR = {
-    'C Major': [60, 62, 64, 65, 67, 69, 71, 72],
-    'G Major': [67, 69, 71, 72, 74, 76, 78, 79],
-    'D Major': [62, 64, 66, 67, 69, 71, 73, 74],
-    'A Major': [69, 71, 73, 74, 76, 78, 80, 81],
-    'F Major': [65, 67, 69, 70, 72, 74, 76, 77],
-    'Bb Major': [70, 72, 74, 75, 77, 79, 81, 82],
-    'Eb Major': [63, 65, 67, 68, 70, 72, 74, 75],
-}
+import scale_library
+from scale_library import ScaleLibrary
 
 INSTRUMENTS = {
     "Acoustic Grand Piano": 0,
@@ -29,6 +22,8 @@ NOTE_LENGTHS = {
     "Eight": 0.5,
     "Sixteenth": 0.25
 }
+
+KEY_SCALES_MAJOR = ScaleLibrary.major_scales()
 
 def generate_scale(
         filename="scale.mid",
@@ -154,3 +149,89 @@ def generate_random_melody(
     pm.write(filename)
 
     return filename
+
+def generate_melody_rule_based(
+        key_name="C Major",
+        tempo=120,
+        instrument_program=0,
+        note_length_fraction=1.0,
+        note_count=16,
+        leap_probability=0.1,
+        max_leap_size=4,
+        contour="arch"
+):
+    """
+    Generate a melody in the chosen key using stepwise motion and occasional leaps
+
+    :param key_name: (str) Name of the key to generate melody with
+    :param tempo: (int) Tempo in BPM
+    :param instrument_program: (int) MIDI program number (instrument)
+    :param note_length_fraction: (float) Multiplier for note duration (1.0 = quarter note)
+    :param note_count: (int) Number of notes to generate
+    :param leap_probability: (float) Probability of occasional leaps instead of steps
+    :param max_leap_size: (int) Maximum leap size in scale degrees
+    :param contour: (str) 'arch', 'ascending', 'descending', or 'random'
+    :return: (str) Filename generated MIDI file
+    """
+
+
+    key_scale = ScaleLibrary.major_scales()[key_name]
+    scale_length = len(key_scale)
+
+    # start on tonic
+    current_index = scale_length // 2
+    melody_indices = [current_index]
+
+    for i in range(1, note_count):
+        # Decide contour direction
+        if contour == "arch":
+            if i < note_count / 2:
+                step_options = [1, 2]
+            else:
+                step_options = [-2, -1]
+        elif contour == "ascending":
+            step_options = [1, 2]
+        elif contour == "descending":
+            step_options = [-2, -1]
+        else:
+            step_options = [-2, -1, 0, 1, 2]
+
+        if random.random() < leap_probability:
+            step = random.choice(
+                [s for s in range(-max_leap_size, max_leap_size + 1) if s != 0]
+            )
+        else:
+            step = random.choice(step_options)
+
+        new_index = current_index + step
+
+        # Clamp to scale boundaries
+        next_index = max(0, min(scale_length - 1, new_index))
+
+        melody_indices.append(next_index)
+        current_index = next_index
+
+    # generate MIDI
+    quarter_duration = 60 / tempo * note_length_fraction
+
+    pm = pretty_midi.PrettyMIDI(initial_tempo=tempo)
+    instrument = pretty_midi.Instrument(program=instrument_program)
+
+    start_time = 0
+    for idx in melody_indices:
+        note_number = key_scale[idx]
+        note = pretty_midi.Note(
+            velocity=100,
+            pitch=note_number,
+            start=start_time,
+            end=start_time + quarter_duration
+        )
+        instrument.notes.append(note)
+        start_time = start_time + quarter_duration
+
+    pm.instruments.append(instrument)
+
+    filename = f"rule_based_melody_{key_name.replace(' ', '_')}.mid"
+    pm.write(filename)
+    return filename
+

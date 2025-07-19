@@ -65,14 +65,7 @@ Teaching Notes:
 
 ## Next Planned Steps
 
-- Build minimal GUI with:
-    - One button → generates random melody
-- Gradually add:
-    - Key selection dropdown
-    - Tempo slider
-    - Instrument dropdown
-    - Note length dropdown
-    - Number of notes spinner
+
 
 ---
 
